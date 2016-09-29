@@ -1,0 +1,17 @@
+{
+  "name": "mybotbuilder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nanette",
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "^3.2.1",
+    "restify": "^4.1.1",
+	"mysql": "^2.11.1",
+	"express": "^4.10.6"
+  }
+}
