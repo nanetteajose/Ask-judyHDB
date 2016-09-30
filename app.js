@@ -118,6 +118,8 @@ bot.endConversationAction('Hello', 'Hello, how can I help you?', { matches: /^he
 bot.endConversationAction('Hi', 'Hello, how can I help you?', { matches: /^hi/i });
 //bot.beginDialogAction('help', '/help', { matches: /^help/i });
 
+return true;
+
 //=========================================================
 // Bots Dialogs
 //=========================================================
