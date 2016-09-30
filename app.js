@@ -26,7 +26,7 @@ var connector = new builder.ChatConnector({
     //appPassword: process.env.APP_SECRET
 	
 	appId: "945fc654-8c53-415d-98f3-defd99c077b4",
-    appPassword: "44OzEU70GKgjYHnGouDiqyk"
+    appPassword: "1QsZho2VqxGguMht04DMpUd"
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
