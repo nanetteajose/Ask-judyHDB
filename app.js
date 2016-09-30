@@ -1,23 +1,6 @@
 
 
-var mysql      = require('mysql');
 
-var connection = mysql.createConnection({
- 
-  host     : 'sql6.freemysqlhosting.net',
-  user     : 'sql6132582',
-  password : '1TXDD9uuxy',
-  database : 'sql6132582'
-  /*
-  host     : 'localhost',
-  user     : 'root',
-  password : 'password',
-  database : 'askjudy123'
-  */
-  
-});
-
-connection.connect();
 
 
 
@@ -117,6 +100,28 @@ bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^.*bye/i });
 bot.endConversationAction('Hello', 'Hello, how can I help you?', { matches: /^hello/i });
 bot.endConversationAction('Hi', 'Hello, how can I help you?', { matches: /^hi/i });
 //bot.beginDialogAction('help', '/help', { matches: /^help/i });
+
+
+
+var mysql      = require('mysql');
+
+var connection = mysql.createConnection({
+ 
+  host     : 'sql6.freemysqlhosting.net',
+  user     : 'sql6132582',
+  password : '1TXDD9uuxy',
+  database : 'sql6132582'
+  /*
+  host     : 'localhost',
+  user     : 'root',
+  password : 'password',
+  database : 'askjudy123'
+  */
+  
+});
+
+connection.connect();
+
 
 return true;
 
