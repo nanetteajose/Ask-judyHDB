@@ -2,10 +2,6 @@
 
 
 
-
-
-
-
 var restify = require('restify');
 var builder = require('botbuilder');
 
@@ -103,5 +99,121 @@ bot.endConversationAction('Hi', 'Hello, how can I help you?', { matches: /^hi/i 
 
 
 
+//=========================================================
+// Bots Dialogs
+//=========================================================
+var style = builder.ListStyle["button"];
 
+//var intents = new builder.IntentDialog();
+
+// Create LUIS recognizer that points at our model and add it as the root '/' dialog for our Cortana Bot.
+//var model = 'https://api.projectoxford.ai/luis/v1/application?id=309391a7-6a95-4a7f-a92c-18bd2b054dec&subscription-key=7faa358bc73447fb9f293306c4ceeb81&q=';
+var model = 'https://api.projectoxford.ai/luis/v1/application?id=50d67e3e-7bf1-45e8-bfe4-fe64b3a6760f&subscription-key=7faa358bc73447fb9f293306c4ceeb81';
+var recognizer = new builder.LuisRecognizer(model);
+var intents = new builder.IntentDialog({ recognizers: [recognizer] });
+//bot.dialog('/', dialog);
+
+var definitions = require('./definitions');
+var q = definitions.q;
+var a = definitions.a;
+
+
+
+for(x in q) {
+	var fn = function (code)  { // Immediately Invoked Function Expression
+				return function () {
+					return function (session) {
+						//session.send("/" + code)
+						session.beginDialog("/" + code);
+					} 
+				} () 
+			} (q[x]);
+	intents.matches(q[x], fn);
+}
+
+
+
+intents.onDefault(function (session) {
+        session.send("Sorry, I'm not sure what you mean. Could you rephrase your question or provide more details?");
+    })	
+
+
+for(x in a) { 
+	
+		//console.log('choice : /' + function (code)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (x))
+		bot.dialog('/' + function (code, object)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (x) , 
+			
+			function (code, obj)  { /* Immediately Invoked Function Expression */ 
+				return function () { 
+			
+					var type = typeof(a[code]);
+					var waterfall_fn = [];
+					var o = a[code];
+					
+					if (type === "string") {
+						
+						waterfall_fn.push(function(session){ session.send(a[code]);session.endDialog();})
+						
+						
+					} else if (type === "object" ){
+						
+						var	options=[];
+						
+						for(option in o.choice.options){
+							options.push(option)
+						}
+						
+						var fn1 = function(session,results) { //prompt
+										//var p = o;
+										builder.Prompts.choice(session, o.choice.question, options, { listStyle: style }); 
+									};
+											
+						waterfall_fn.push(fn1)
+						
+						
+						
+						var fn2 = function(session,results, next) { //prompt
+										//session.send("f2");
+										if (results.response) {
+											var response = results.response.entity;
+											
+											
+
+											var is_response_valid = !(typeof(a[code].choice.options[response]) === "undefined")
+											
+											if (is_response_valid) {
+												session.beginDialog('/'+ a[code].choice.options[response])
+											} else {
+												session.endDialogWithResults(results);
+											}
+											
+											
+											
+										} else {
+											session.endDialogWithResults(results);
+										}
+									}
+						
+						
+						
+						waterfall_fn.push(fn2)
+					}
+					
+					
+					
+					//console.log(waterfall_fn)
+					return waterfall_fn; 
+			
+			
+			
+				} () 
+			} (x, a[x])
+		);
+
+}
+
+
+
+
+bot.dialog('/', intents);
 
