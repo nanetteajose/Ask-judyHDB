@@ -144,16 +144,16 @@ dbDao.init(function(){
 	
 	
 	dbActions.initAnswers(function(err, items){
-	
+	console.log(items);
 var a = items;		
 for(x in a) { 
 	
-		//console.log('choice : /' + function (code)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (x))
+		console.log('choice : /' + function (code)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (a[x].name))
 		bot.dialog('/' + function (code, object)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (a[x].name) , 
 			
 			function (code, obj)  { /* Immediately Invoked Function Expression */ 
 				return function () { 
-					var txt = a[code].description;
+					var txt = obj.description;
 					var acode = (txt.slice(0,1)!="{"?txt:JSON.parse(txt));
 					var type = typeof(acode);
 					var waterfall_fn = [];
@@ -161,7 +161,7 @@ for(x in a) {
 					
 					if (type === "string") {
 						
-						waterfall_fn.push(function(session){ session.send(a[code].name);session.endDialog();})
+						waterfall_fn.push(function(session){ session.send(obj.name);session.endDialog();})
 						
 						
 					} else if (type === "object" ){

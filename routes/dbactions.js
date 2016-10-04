@@ -34,7 +34,7 @@ DbActions.prototype = {
         var querySpec = {
             query: 'SELECT * FROM root r WHERE r.category=@answer',
             parameters: [{
-                name: '@question',
+                name: '@answer',
                 value: 'Answer'
             }]
         };
