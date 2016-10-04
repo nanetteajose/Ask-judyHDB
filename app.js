@@ -1,4 +1,7 @@
-
+var DocumentDBClient = require('documentdb').DocumentClient;
+var config = require('./config');
+var DbActions = require('./routes/dbactions');
+var DbDao = require('./models/dbDao');
 
 
 
@@ -98,7 +101,6 @@ bot.endConversationAction('Hi', 'Hello, how can I help you?', { matches: /^hi/i 
 //bot.beginDialogAction('help', '/help', { matches: /^help/i });
 
 
-
 //=========================================================
 // Bots Dialogs
 //=========================================================
@@ -113,46 +115,53 @@ var recognizer = new builder.LuisRecognizer(model);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
 //bot.dialog('/', dialog);
 
-var definitions = require('./definitions');
-var q = definitions.q;
-var a = definitions.a;
-
-
-
-for(x in q) {
-	var fn = function (code)  { // Immediately Invoked Function Expression
-				return function () {
-					return function (session) {
-						//session.send("/" + code)
-						session.beginDialog("/" + code);
-					} 
-				} () 
-			} (q[x]);
-	intents.matches(q[x], fn);
-}
-
-
-
-intents.onDefault(function (session) {
-        session.send("Sorry, I'm not sure what you mean. Could you rephrase your question or provide more details?");
-    })	
-
-
+var docDbClient = new DocumentDBClient(config.host, {
+    masterKey: config.authKey
+});
+var dbDao = new DbDao(docDbClient, config.databaseId, config.collectionId);
+var dbActions = new DbActions(dbDao);
+dbDao.init(function(){
+	
+	dbActions.initQuestions(function(err, items){
+	
+		console.log(items);
+		var q = items;
+		for(x in q) {
+			var fn = function (code)  { // Immediately Invoked Function Expression
+						return function () {
+							return function (session) {
+								//session.send("/" + code)
+								session.beginDialog("/" + code);
+							} 
+						} () 
+					} (q[x.name]);
+			intents.matches(q[x.name], fn);
+		}
+		
+		
+		
+	}); // init questions
+	
+	
+	dbActions.initAnswers(function(err, items){
+	
+var a = items;		
 for(x in a) { 
 	
 		//console.log('choice : /' + function (code)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (x))
-		bot.dialog('/' + function (code, object)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (x) , 
+		bot.dialog('/' + function (code, object)  { /* Immediately Invoked Function Expression */ return function () { return code; } () } (a[x].name) , 
 			
 			function (code, obj)  { /* Immediately Invoked Function Expression */ 
 				return function () { 
-			
-					var type = typeof(a[code]);
+					var txt = a[code].description;
+					var acode = (txt.slice(0,1)!="{"?txt:JSON.parse(txt));
+					var type = typeof(acode);
 					var waterfall_fn = [];
-					var o = a[code];
+					var o = acode;
 					
 					if (type === "string") {
 						
-						waterfall_fn.push(function(session){ session.send(a[code]);session.endDialog();})
+						waterfall_fn.push(function(session){ session.send(a[code].name);session.endDialog();})
 						
 						
 					} else if (type === "object" ){
@@ -179,10 +188,10 @@ for(x in a) {
 											
 											
 
-											var is_response_valid = !(typeof(a[code].choice.options[response]) === "undefined")
+											var is_response_valid = !(typeof(acode.choice.options[response]) === "undefined")
 											
 											if (is_response_valid) {
-												session.beginDialog('/'+ a[code].choice.options[response])
+												session.beginDialog('/'+ acode.choice.options[response])
 											} else {
 												session.endDialogWithResults(results);
 											}
@@ -207,10 +216,48 @@ for(x in a) {
 			
 			
 				} () 
-			} (x, a[x])
+			} (a[x].name, a[x])
 		);
 
 }
+		
+		
+		
+	}) //end init answers
+	
+	
+	
+});
+
+
+
+
+
+var definitions = require('./definitions');
+var q = definitions.q;
+var a = definitions.a;
+
+
+/*
+for(x in q) {
+	var fn = function (code)  { // Immediately Invoked Function Expression
+				return function () {
+					return function (session) {
+						//session.send("/" + code)
+						session.beginDialog("/" + code);
+					} 
+				} () 
+			} (q[x]);
+	intents.matches(q[x], fn);
+}
+*/
+
+
+intents.onDefault(function (session) {
+        session.send("Sorry, I'm not sure what you mean. Could you rephrase your question or provide more details?");
+    })	
+
+
 
 
 
