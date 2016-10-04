@@ -227,6 +227,10 @@ for(x in a) {
 	
 	
 	
+	
+	bot.dialog('/', intents);
+	
+	
 });
 
 
@@ -262,5 +266,5 @@ intents.onDefault(function (session) {
 
 
 
-bot.dialog('/', intents);
+
 
