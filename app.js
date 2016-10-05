@@ -109,8 +109,8 @@ var style = builder.ListStyle["button"];
 //var intents = new builder.IntentDialog();
 
 // Create LUIS recognizer that points at our model and add it as the root '/' dialog for our Cortana Bot.
-//var model = 'https://api.projectoxford.ai/luis/v1/application?id=309391a7-6a95-4a7f-a92c-18bd2b054dec&subscription-key=7faa358bc73447fb9f293306c4ceeb81&q=';
-var model = 'https://api.projectoxford.ai/luis/v1/application?id=50d67e3e-7bf1-45e8-bfe4-fe64b3a6760f&subscription-key=7faa358bc73447fb9f293306c4ceeb81';
+//var model = 'https://api.projectoxford.ai/luis/v1/application?id=50d67e3e-7bf1-45e8-bfe4-fe64b3a6760f&subscription-key=7faa358bc73447fb9f293306c4ceeb81';
+var model = 'https://api.projectoxford.ai/luis/v1/application?id=33d6986f-cd13-4711-a0c2-720bbdcae475&subscription-key=896bf1af48e14c74856a6f3cc9e5d8f4';
 var recognizer = new builder.LuisRecognizer(model);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
 //bot.dialog('/', dialog);
@@ -160,7 +160,7 @@ for(x in a) {
 					var o = acode;
 					
 					if (type === "string") {
-						//console.log(''+obj.name)
+						//console.log('str '+obj.name)
 						waterfall_fn.push(function(session){ session.send(obj.description);session.endDialog();})
 						
 						
