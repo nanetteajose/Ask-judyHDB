@@ -95,10 +95,6 @@ bot.use(builder.Middleware.dialogVersion({ version: 1.0, resetCommand: /^reset/i
 //=========================================================
 
 bot.endConversationAction('goodbye', 'Goodbye:)', { matches: /^.*bye/i });
-bot.endConversationAction('Hello', 'Hello, how can I help you?', { matches: /^hello/i });
-bot.endConversationAction('Hi', 'Hello, how can I help you?', { matches: /^hi/i });
-//bot.beginDialogAction('help', '/help', { matches: /^help/i });
-
 
 //=========================================================
 // Bots Dialogs
@@ -112,6 +108,14 @@ var model = 'https://api.projectoxford.ai/luis/v1/application?id=33d6986f-cd13-4
 var recognizer = new builder.LuisRecognizer(model);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
 //bot.dialog('/', dialog);
+
+
+intents.matches(/^hello|hi/i, [
+    function (session) {
+        session.send("Hello, how can I help you?");
+        session.endDialog("");
+    }
+]);
 
 var docDbClient = new DocumentDBClient(config.host, {
     masterKey: config.authKey
