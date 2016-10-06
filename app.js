@@ -21,8 +21,7 @@ var server = restify.createServer();
 // Create chat bot
 var connector = new builder.ChatConnector({
     //appId: process.env.APP_ID,
-	//appId: "b70b4985-8de0-46ca-9d13-c94846589419",
-    //appPassword: process.env.APP_SECRET
+	//appPassword: process.env.APP_SECRET
 	
 	appId: "945fc654-8c53-415d-98f3-defd99c077b4",
     appPassword: "1QsZho2VqxGguMht04DMpUd"
@@ -109,7 +108,6 @@ var style = builder.ListStyle["button"];
 //var intents = new builder.IntentDialog();
 
 // Create LUIS recognizer that points at our model and add it as the root '/' dialog for our Cortana Bot.
-//var model = 'https://api.projectoxford.ai/luis/v1/application?id=50d67e3e-7bf1-45e8-bfe4-fe64b3a6760f&subscription-key=7faa358bc73447fb9f293306c4ceeb81';
 var model = 'https://api.projectoxford.ai/luis/v1/application?id=33d6986f-cd13-4711-a0c2-720bbdcae475&subscription-key=896bf1af48e14c74856a6f3cc9e5d8f4';
 var recognizer = new builder.LuisRecognizer(model);
 var intents = new builder.IntentDialog({ recognizers: [recognizer] });
@@ -129,7 +127,26 @@ dbDao.init(function(){
 		for(x in q) {
 			var fn = function (code)  { // Immediately Invoked Function Expression
 						return function () {
-							return function (session) {
+							return function (session, args) {
+								
+								var subtopic = "";
+								
+								for(i in args.entities){
+									var entity = args.entities[i]
+									var type = entity.type;
+									
+									if (type === "Topic") {
+										session.userData.topic = entity
+									} else if (type === "subtopic"){
+										subtopic = args.intents[0].intent + " ";
+									}
+									
+									console.log('str '+  entity.type + ' ' + entity.entity)
+								}
+								
+								
+
+								
 								//session.send("/" + code)
 								session.beginDialog("/" + code);
 							} 
@@ -161,7 +178,7 @@ for(x in a) {
 					
 					if (type === "string") {
 						//console.log('str '+obj.name)
-						waterfall_fn.push(function(session){ session.send(obj.description);session.endDialog();})
+						waterfall_fn.push(function(session, args, fn){ session.send(obj.description);session.endDialog();})
 						
 						
 					} else if (type === "object" ){
@@ -174,6 +191,7 @@ for(x in a) {
 						
 						var fn1 = function(session,results) { //prompt
 										//var p = o;
+										
 										builder.Prompts.choice(session, o.choice.question, options, { listStyle: style }); 
 									};
 											
@@ -183,6 +201,7 @@ for(x in a) {
 						
 						var fn2 = function(session,results, next) { //prompt
 										//session.send("f2");
+										
 										if (results.response) {
 											var response = results.response.entity;
 											
@@ -221,72 +240,7 @@ for(x in a) {
 		
 		
 		
-		var fnz = function (code, obj)  { /* Immediately Invoked Function Expression */ 
-				return function () { 
-					var txt = obj.description;
-					var acode = (txt.slice(0,1)!="{"?txt:JSON.parse(txt));
-					var type = typeof(acode);
-					var waterfall_fn = [];
-					var o = acode;
-					
-					if (type === "string") {
-						
-						waterfall_fn.push(function(session){ session.send(obj.name);session.endDialog();})
-						
-						
-					} else if (type === "object" ){
-						
-						var	options=[];
-						
-						for(option in o.choice.options){
-							options.push(option)
-						}
-						
-						var fn1 = function(session,results) { //prompt
-										//var p = o;
-										builder.Prompts.choice(session, o.choice.question, options, { listStyle: style }); 
-									};
-											
-						waterfall_fn.push(fn1)
-						
-						
-						
-						var fn2 = function(session,results, next) { //prompt
-										//session.send("f2");
-										if (results.response) {
-											var response = results.response.entity;
-											
-											
-
-											var is_response_valid = !(typeof(acode.choice.options[response]) === "undefined")
-											
-											if (is_response_valid) {
-												session.beginDialog('/'+ acode.choice.options[response])
-											} else {
-												session.endDialogWithResults(results);
-											}
-											
-											
-											
-										} else {
-											session.endDialogWithResults(results);
-										}
-									}
-						
-						
-						
-						waterfall_fn.push(fn2)
-					}
-					
-					
-					
-					//console.log(waterfall_fn)
-					return waterfall_fn; 
-			
-			
-			
-				} () 
-			} (a[x].name, a[x]);
+		
 			
 			//console.log(fnz)
 
@@ -303,30 +257,6 @@ for(x in a) {
 	
 	
 });
-
-
-
-
-
-var definitions = require('./definitions');
-var q = definitions.q;
-var a = definitions.a;
-
-
-/*
-for(x in q) {
-	var fn = function (code)  { // Immediately Invoked Function Expression
-				return function () {
-					return function (session) {
-						//session.send("/" + code)
-						session.beginDialog("/" + code);
-					} 
-				} () 
-			} (q[x]);
-	intents.matches(q[x], fn);
-}
-*/
-
 
 intents.onDefault(function (session) {
         session.send("Sorry, I'm not sure what you mean. Could you rephrase your question or provide more details?");
