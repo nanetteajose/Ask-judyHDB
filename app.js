@@ -117,6 +117,13 @@ intents.matches(/^hello|hi/i, [
     }
 ]);
 
+intents.matches(/^thank |thanks/i, [
+    function (session) {
+        session.send("You are welcome.");
+        session.endDialog("");
+    }
+]);
+
 var docDbClient = new DocumentDBClient(config.host, {
     masterKey: config.authKey
 });
@@ -261,6 +268,201 @@ for(x in a) {
 	
 	
 });
+
+
+//search parking fines|offenses
+var request = require("request");
+var async = require("async");
+//request.debug = true;
+
+var request_parkingfines =  {
+	
+	
+	
+	postFn : function(data, fn){
+	
+	request.post({
+	  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+	  
+	  jar: true,
+	  form: data
+		}, function(error, response, body) {
+		  //console.log(body);
+		  console.log('done')
+		  fn(body);
+		});
+	
+	}, // end postFn
+	
+	getFn : function(data) {
+		
+		request({
+	  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+	  method: "GET",
+	  jar: true,
+		}, function(error, response, body) {
+		  //parse body to get data
+		  
+
+		  
+		  var start = body.indexOf('name="javax.faces.ViewState"');
+		  var tmp = (body.slice(start));
+		  var end = tmp.indexOf('" />',1);
+		  tmp = tmp.slice(0, end + 1);
+		  tmp = tmp.split(" ");
+		  tmp = tmp[2].split("=");
+		  data = {
+			searchKeyword:"",
+			
+			"view:form1:j_id_jsp_1367732672_4":"true",
+			"view:form1:noticeVehicleType" :data.type,
+			"view:form1:vehicleNoticeNo" :data.vehicleNumber,
+			"view:form1:continueHidbuttonID" : "Continue",			
+			"javax.faces.ViewState":tmp[1].replace('"',"")+"==",
+			"view:form1_SUBMIT":"1"
+		
+		  }
+		  //console.log(body)
+		  console.log(tmp[1].replace('"',"")+"==")
+		  
+		  request_parkingfines.postFn(data);
+		  
+		});
+		
+	}
+	
+	
+}
+
+
+var searchtype = { "By Vehicle No": "V","By Notice No":"N"};
+
+
+intents.matches(/^search parking [fines|offense]/i, [
+    function (session) {
+		
+		var terms = '<a target="_blank" href="http://www.hdb.gov.sg/cs/infoweb/parking-fines-e-payment-(non-login)/terms-and-conditions">Terms and Conditions of Parking Fines e-Payment</a>';
+		builder.Prompts.confirm(session, "You are about use the service of finding parking offenses, Continuing this action means that you have read and understood the " + terms, { listStyle: style });
+		
+        
+    },
+    function (session, results, next) {
+		
+		console.log("LOG==============" + results.response);
+		
+        if (results.response) {            
+            builder.Prompts.choice(session, "How would you like to search?", searchtype , { listStyle: style } );
+        } else {
+            next();
+        }
+    },
+    function (session, results, next) {
+        if (results.response) { session.dialogData.type = searchtype[results.response.entity];
+		console.log("text=========: " + session.dialogData.type)
+			var txttype = (session.dialogData.type== "By Vehicle No"? "Vehicle" :"Notice");
+            builder.Prompts.text(session, "Please provide the " + txttype + " number");
+        } else {
+            next();
+        }
+    },
+    function (session, results, next) {
+		
+		console.log("text=========: " + results.response)
+		
+        if (results.response) { session.dialogData.vehicleNumber = results.response;
+		
+			var data;
+			var s = session;
+			var n = next;
+			var txtbody;
+			
+			request({
+					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					  method: "GET",
+					  jar: true,
+						}, function(error, response, body) {
+						  //parse body to get data
+						  
+						  var start = body.indexOf('name="javax.faces.ViewState"');
+						  var tmp = (body.slice(start));
+						  var end = tmp.indexOf('" />',1);
+						  tmp = tmp.slice(0, end + 1);
+						  tmp = tmp.split(" ");
+						  tmp = tmp[2].split("=");
+						  data = {
+							searchKeyword:"",
+							
+							"view:form1:j_id_jsp_1367732672_4":"true",
+							"view:form1:noticeVehicleType" :s.dialogData.type,
+							"view:form1:vehicleNoticeNo" :s.dialogData.vehicleNumber,
+							"view:form1:continueHidbuttonID" : "Continue",			
+							"javax.faces.ViewState":tmp[1].replace('"',"")+"==",
+							"view:form1_SUBMIT":"1"
+							
+						
+						  }
+						  
+						 
+						  console.log(tmp[1].replace('"',"")+"==")
+						  
+						  //s.send(tmp[1].replace('"',"")+"==")
+						  
+						  s.dialogData.requestdata = data
+						  
+						  n();
+						  
+						});
+			
+			
+        } else {
+            session.send("Ok. May I help you with another question?");
+        }
+    },function (session, results, next) {
+        var data;
+			var s = session;
+			var n = next;
+			var txtbody;	
+
+		//request.debug = true;	
+			
+		request.post({
+						  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+						  
+						  jar: true,
+						  
+						  form: session.dialogData.requestdata
+							}, function(error, response, body) {
+							  //console.log(body);
+							  request.debug = false;	
+							  
+							  console.log('done');
+							  txtbody =body;
+							  s.send("Done");
+							  
+							  var start = body.indexOf('<table id="view:form1:tbNoticeList"');
+							  var tmp = (body.slice(start));
+							  var end = tmp.indexOf('</table>',1);
+							  tmp = tmp.slice(0, end + 9);
+							  console.log("tmpv=========start: " + tmp+"tmpv=========end")
+							  
+							  
+							  
+							  s.send(tmp);
+							  //console.log("text3=========: " + data.vehicleNumber)
+							  n();
+					});
+		
+    },function (session, results, next) {
+        session.send("You are encouraged to settle your fine(s) early to avoid incurring higher fine(s) or Court action.");
+		
+		
+		
+    },
+	
+	
+]);
+
+
 
 intents.onDefault(function (session) {
         session.send("Sorry, I'm not sure what you mean. Could you rephrase your question or provide more details?");
