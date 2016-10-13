@@ -273,6 +273,7 @@ for(x in a) {
 //search parking fines|offenses
 var request = require("request");
 var async = require("async");
+
 //request.debug = true;
 
 var searchParkingFines = function( session, address ) {
@@ -290,7 +291,8 @@ var searchParkingFines = function( session, address ) {
 	
 	
 		request({
-					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					  //url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					  url: "https://www.google.com.sg/",
 					  method: "GET",
 					  jar: true,
 						}, function(error, response, body) {
