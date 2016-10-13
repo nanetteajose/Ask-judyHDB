@@ -288,8 +288,8 @@ var searchParkingFines = function( session, address ) {
 	
 	request({
 					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-					  method: "POST",
-					 
+					  method: "GET",
+					 jar: true,
 						}, function(error, response, body) {
 							
 			 var msg = new builder.Message()
