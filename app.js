@@ -282,7 +282,7 @@ var searchParkingFines = function( session, address ) {
 	
 	var txtbody;
 	var m_address = session.message.address;
-	request.debug = true;
+	//request.debug = true;
 	var thisbot = bot;			
 	
 	async.series([
