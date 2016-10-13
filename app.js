@@ -359,7 +359,7 @@ intents.matches(/^search parking [fines|offense]/i, [
     function (session, results, next) {
         if (results.response) { session.dialogData.type = searchtype[results.response.entity];
 		console.log("text=========: " + session.dialogData.type)
-			var txttype = (session.dialogData.type== "By Vehicle No"? "Vehicle" :"Notice");
+			var txttype = (session.dialogData.type== "V"? "Vehicle" :"Notice");
             builder.Prompts.text(session, "Please provide the " + txttype + " number");
         } else {
             next();
