@@ -286,19 +286,7 @@ var searchParkingFines = function( session, address ) {
 	var thisbot = bot;			
 	
 	
-	request({
-					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-					  method: "GET",
-					 jar: true,
-						}, function(error, response, body) {
-							
-			 var msg = new builder.Message()
-								.address(m_address)
-								.text("connected to service searching now nn");
-							thisbot.send(msg);
-							
-						}
-			);			
+			
 	
 	
 		request({
@@ -306,6 +294,17 @@ var searchParkingFines = function( session, address ) {
 					  method: "GET",
 					  jar: true,
 						}, function(error, response, body) {
+							
+							 console.log(body);
+							 
+							var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now 12");
+							thisbot.send(msg);
+							
+							
+							return;
+							
 						  //parse body to get data
 						  
 						  var start = body.indexOf('name="javax.faces.ViewState"');
