@@ -376,7 +376,7 @@ intents.matches(/^parking [fines|offense]/i, [
 			var s = session;
 			var n = next;
 			var txtbody;
-			
+			request.debug = true;
 			request({
 					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
 					  method: "GET",
