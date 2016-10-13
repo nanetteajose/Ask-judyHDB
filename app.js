@@ -279,87 +279,16 @@ var async = require("async");
 var searchParkingFines = function( session, address ) {
 	
 	var data;
-	var s = session;
-	
+	var s = session;	
 	var txtbody;
 	var m_address = session.message.address;
 	request.debug = true;
 	var thisbot = bot;			
 	
 	
-			
-	
-	
-		request({
-					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-					  //url: "https://www.google.com.sg/",
-					  method: "GET",
-					  //jar: true,
-						}, function(error, response, body) {
-							
-							 console.log(body);
-							 
-							var msg = new builder.Message()
-								.address(m_address)
-								.text("connected to service searching now 12");
-							thisbot.send(msg);
-							
-							
-							return;
-							
-						  //parse body to get data
-						  
-						  var start = body.indexOf('name="javax.faces.ViewState"');
-						  var tmp = (body.slice(start));
-						  var end = tmp.indexOf('" />',1);
-						  tmp = tmp.slice(0, end + 1);
-						  tmp = tmp.split(" ");
-						  tmp = tmp[2].split("=");
-						  data = {
-							searchKeyword:"",
-							
-							"view:form1:j_id_jsp_1367732672_4":"true",
-							"view:form1:noticeVehicleType" :s.dialogData.type,
-							"view:form1:vehicleNoticeNo" :s.dialogData.vehicleNumber,
-							"view:form1:continueHidbuttonID" : "Continue",			
-							"javax.faces.ViewState":tmp[1].replace('"',"")+"==",
-							"view:form1_SUBMIT":"1"
-							
-						
-						  }
-						  
-						 
-						  console.log(tmp[1].replace('"',"")+"==")
-						  
-						  //s.send(tmp[1].replace('"',"")+"==")
-						  
-						  s.dialogData.requestdata = data
-						  var msg = new builder.Message()
-								.address(m_address)
-								.text("connected to service searching now");
-							thisbot.send(msg);
-						  
-						  
-				});
-	
-	
-	return;
-	
-	
-	async.series([
-	//f1
-	function() {
-	
-	
-			}, function(){
-				var msg = new builder.Message()
-								.address(m_address)
-								.text("connected to service searching now 123");
-							thisbot.send(msg);
-				
-			},
-		//f2
-			function(){
+	var postFn = function(){
+		
+		
 			
 					request.post({
 						  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
@@ -445,10 +374,75 @@ var searchParkingFines = function( session, address ) {
 								.text(tmp);
 							thisbot.send(msg);
 					});
+		
+	}
 
-
-			
-			} //end f2
+	
+	
+	async.series([
+	//f1
+	function() {
+		request({
+					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					  //url: "https://www.google.com.sg/",
+					  method: "GET",
+					  jar: true,
+						}, function(error, response, body) {
+							
+							 //console.log(body);
+							 
+							//var msg = new builder.Message()
+							//	.address(m_address)
+							//	.text("connected to service searching now 12");
+							//thisbot.send(msg);
+							
+							
+							//return;
+							
+						  //parse body to get data
+						  
+						  var start = body.indexOf('name="javax.faces.ViewState"');
+						  var tmp = (body.slice(start));
+						  var end = tmp.indexOf('" />',1);
+						  tmp = tmp.slice(0, end + 1);
+						  tmp = tmp.split(" ");
+						  tmp = tmp[2].split("=");
+						  data = {
+							searchKeyword:"",
+							
+							"view:form1:j_id_jsp_1367732672_4":"true",
+							"view:form1:noticeVehicleType" :s.dialogData.type,
+							"view:form1:vehicleNoticeNo" :s.dialogData.vehicleNumber,
+							"view:form1:continueHidbuttonID" : "Continue",			
+							"javax.faces.ViewState":tmp[1].replace('"',"")+"==",
+							"view:form1_SUBMIT":"1"
+							
+						
+						  }
+						  
+						 
+						  console.log(tmp[1].replace('"',"")+"==")
+						  
+						  //s.send(tmp[1].replace('"',"")+"==")
+						  
+						  s.dialogData.requestdata = data
+						  var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now");
+							thisbot.send(msg);
+						  
+						  postFn();
+						  
+				});
+	
+			}, function(){
+				var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now 123");
+							thisbot.send(msg);
+				
+			},
+		
 	]);
 	
 	
