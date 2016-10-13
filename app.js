@@ -320,11 +320,20 @@ var searchParkingFines = function( session, address ) {
 						  //s.send(tmp[1].replace('"',"")+"==")
 						  
 						  s.dialogData.requestdata = data
-						  
+						  var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now");
+							bot.send(msg);
 						  
 						  
 						});
 	
+			}, function(){
+				var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now");
+							bot.send(msg);
+				
 			},
 		//f2
 			function(){
