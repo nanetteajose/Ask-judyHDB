@@ -406,7 +406,7 @@ intents.matches(/^parking [fines|offense]/i, [
 						 
 						  console.log(tmp[1].replace('"',"")+"==")
 						  
-						  //s.send(tmp[1].replace('"',"")+"==")
+						  s.send(tmp[1].replace('"',"")+"==")
 						  
 						  s.dialogData.requestdata = data
 						  
