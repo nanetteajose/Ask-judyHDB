@@ -285,9 +285,7 @@ var searchParkingFines = function( session, address ) {
 	//request.debug = true;
 	var thisbot = bot;			
 	
-	async.series([
-	//f1
-	function() {
+	
 		request({
 					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
 					  method: "GET",
@@ -326,7 +324,16 @@ var searchParkingFines = function( session, address ) {
 							thisbot.send(msg);
 						  
 						  
-						});
+				});
+	
+	
+	
+	
+	
+	async.series([
+	//f1
+	function() {
+	
 	
 			}, function(){
 				var msg = new builder.Message()
