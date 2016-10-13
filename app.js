@@ -283,7 +283,7 @@ var searchParkingFines = function( session, address ) {
 	var txtbody;
 	var m_address = session.message.address;
 	request.debug = true;
-				
+	var thisbot = bot;			
 	
 	async.series([
 	//f1
@@ -323,7 +323,7 @@ var searchParkingFines = function( session, address ) {
 						  var msg = new builder.Message()
 								.address(m_address)
 								.text("connected to service searching now");
-							bot.send(msg);
+							thisbot.send(msg);
 						  
 						  
 						});
@@ -331,8 +331,8 @@ var searchParkingFines = function( session, address ) {
 			}, function(){
 				var msg = new builder.Message()
 								.address(m_address)
-								.text("connected to service searching now");
-							bot.send(msg);
+								.text("connected to service searching now 123");
+							thisbot.send(msg);
 				
 			},
 		//f2
@@ -420,7 +420,7 @@ var searchParkingFines = function( session, address ) {
 							var msg = new builder.Message()
 								.address(m_address)
 								.text(tmp);
-							bot.send(msg);
+							thisbot.send(msg);
 					});
 
 
