@@ -279,7 +279,7 @@ var searchParkingFines = function( session, address ) {
 	
 	var data;
 	var s = session;
-	var n = next;
+	
 	var txtbody;
 	var m_address = session.message.address;
 	request.debug = true;
