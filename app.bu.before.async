@@ -275,20 +275,59 @@ var request = require("request");
 var async = require("async");
 //request.debug = true;
 
-var searchParkingFines = function( session, address ) {
+var searchParkingFines = function( args ) {
 	
-	var data;
-	var s = session;
-	var n = next;
-	var txtbody;
-	var m_address = session.message.address;
-	request.debug = true;
-				
 	
-	async.series([
-	//f1
-	function() {
-		request({
+	
+	async([]);
+	
+	
+}
+
+
+var searchtype = { "By Vehicle No": "V","By Notice No":"N"};
+
+
+//intents.matches(/^search parking [fines|offense]/i, [
+intents.matches(/^parking [fines|offense]/i, [
+    function (session) {
+		
+		var terms = '<a target="_blank" href="http://www.hdb.gov.sg/cs/infoweb/parking-fines-e-payment-(non-login)/terms-and-conditions">Terms and Conditions of Parking Fines e-Payment</a>';
+		builder.Prompts.confirm(session, "You are about use the service of finding parking offenses, Continuing this action means that you have read and understood the " + terms, { listStyle: style });
+		
+        
+    },
+    function (session, results, next) {
+		
+		console.log("LOG==============" + results.response);
+		
+        if (results.response) {            
+            builder.Prompts.choice(session, "How would you like to search?", searchtype , { listStyle: style } );
+        } else {
+            next();
+        }
+    },
+    function (session, results, next) {
+        if (results.response) { session.dialogData.type = searchtype[results.response.entity];
+		console.log("text=========: " + session.dialogData.type)
+			var txttype = (session.dialogData.type== "V"? "Vehicle" :"Notice");
+            builder.Prompts.text(session, "Please provide the " + txttype + " number");
+        } else {
+            next();
+        }
+    },
+    function (session, results, next) {
+		
+		console.log("text=========: " + results.response)
+		
+        if (results.response) { session.dialogData.vehicleNumber = results.response;
+		
+			var data;
+			var s = session;
+			var n = next;
+			var txtbody;
+			request.debug = true;
+			request({
 					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
 					  method: "GET",
 					  jar: true,
@@ -317,31 +356,39 @@ var searchParkingFines = function( session, address ) {
 						 
 						  console.log(tmp[1].replace('"',"")+"==")
 						  
-						  //s.send(tmp[1].replace('"',"")+"==")
+						  s.send(tmp[1].replace('"',"")+"==")
 						  
 						  s.dialogData.requestdata = data
 						  
-						  
+						  n();
 						  
 						});
-	
-			},
-		//f2
-			function(){
 			
-					request.post({
+				session.sendTyping();
+        } else {
+            session.send("Ok. May I help you with another question?");
+        }
+    },function (session, results, next) {
+        var data;
+			var s = session;
+			var n = next;
+			var txtbody;	
+
+		//request.debug = true;	
+		session.send("Ok. trying to do POST request?");	
+		request.post({
 						  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
 						  
 						  jar: true,
 						  
-						  form: s.dialogData.requestdata
+						  form: session.dialogData.requestdata
 							}, function(error, response, body) {
 							  //console.log(body);
-							  //equest.debug = false;	
+							  request.debug = false;	
 							  
 							  console.log('done');
 							  txtbody =body;
-							  //s.send("Done");
+							  s.send("Done");
 							  
 							  var start = body.indexOf('<table id="view:form1:tbNoticeList"');
 							  var tmp = (body.slice(start));
@@ -384,7 +431,6 @@ var searchParkingFines = function( session, address ) {
 
 
 								//var thcount = (tmphead.match(/<td /g) || []).length;
-								/*
 								var tmpcontstring;
 								tmpcontstring = "";
 								for (i=1;i<=5;i++)
@@ -407,65 +453,17 @@ var searchParkingFines = function( session, address ) {
 								s.send(thlist[x] + " : " + tdlist[x]);
 								}
 
-								}*/
-							var msg = new builder.Message()
-								.address(m_address)
-								.text(tmp);
-							bot.send(msg);
+								}
+								//alert(finalstr)
+							  console.log("final"+finalstr+"final");
+							 // s.send(finalstr);
+							  //console.log("text3=========: " + data.vehicleNumber)
+							  n();
 					});
-
-
-			
-			} //end f2
-	]);
-	
-	
-}
-
-
-var searchtype = { "By Vehicle No": "V","By Notice No":"N"};
-
-
-//intents.matches(/^search parking [fines|offense]/i, [
-intents.matches(/^parking [fines|offense]/i, [
-    function (session) {
 		
-		var terms = '<a target="_blank" href="http://www.hdb.gov.sg/cs/infoweb/parking-fines-e-payment-(non-login)/terms-and-conditions">Terms and Conditions of Parking Fines e-Payment</a>';
-		builder.Prompts.confirm(session, "You are about use the service of finding parking offenses, Continuing this action means that you have read and understood the " + terms, { listStyle: style });
-		
-        
-    },
-    function (session, results, next) {
-		
-		console.log("LOG==============" + results.response);
-		
-        if (results.response) {            
-            builder.Prompts.choice(session, "How would you like to search?", searchtype , { listStyle: style } );
-        } else {
-            next();
-        }
-    },
-    function (session, results, next) {
-        if (results.response) { session.dialogData.type = searchtype[results.response.entity];
-		console.log("text=========: " + session.dialogData.type)
-			var txttype = (session.dialogData.type== "V"? "Vehicle" :"Notice");
-            builder.Prompts.text(session, "Please provide the " + txttype + " number");
-        } else {
-            next();
-        }
-    },
-    function (session, results, next) {
-		
-		console.log("text=========: " + results.response)
-		
-        if (results.response) { session.dialogData.vehicleNumber = results.response;
-			session.send("Looking up your info...");
-			searchParkingFines(session);
-        } else {
-            session.send("Ok. May I help you with another question?");
-        }
     },function (session, results, next) {
         session.send("You are encouraged to settle your fine(s) early to avoid incurring higher fine(s) or Court action.");
+		
 		
 		
     },
