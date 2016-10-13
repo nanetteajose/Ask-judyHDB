@@ -338,7 +338,8 @@ var request_parkingfines =  {
 var searchtype = { "By Vehicle No": "V","By Notice No":"N"};
 
 
-intents.matches(/^search parking [fines|offense]/i, [
+//intents.matches(/^search parking [fines|offense]/i, [
+intents.matches(/^parking [fines|offense]/i, [
     function (session) {
 		
 		var terms = '<a target="_blank" href="http://www.hdb.gov.sg/cs/infoweb/parking-fines-e-payment-(non-login)/terms-and-conditions">Terms and Conditions of Parking Fines e-Payment</a>';
@@ -445,9 +446,67 @@ intents.matches(/^search parking [fines|offense]/i, [
 							  tmp = tmp.slice(0, end + 9);
 							  console.log("tmpv=========start: " + tmp+"tmpv=========end")
 							  
-							  
-							  
-							  s.send(tmp);
+							 
+
+								var headstart = tmp.indexOf('<thead');
+								var tmphead = (tmp.slice(headstart));
+								var headend = tmphead.indexOf('</thead>',1);
+								tmphead = tmphead.slice(0, headend + 9);
+
+								var startkey = '<div style="overflow: -moz-scrollbars-none; overflow-x: hidden; width: 100%;" >'
+								var endkey = '</div>'
+
+
+								//var thcount = (tmphead.match(/<th /g) || []).length;
+								var tmpstring;
+								tmpstring = "";
+								for (i=1;i<=5;i++)
+								{
+								var thstart = tmphead.indexOf(startkey);
+								var thend = tmphead.indexOf(endkey);
+								var contstr = tmphead.slice(thstart, thend );
+								tmpstring = tmpstring + contstr.slice(startkey.length, thend) + ";"
+								tmphead = tmphead.slice(thend + 6, headend );
+								}
+								
+
+								var headstart = tmp.indexOf('<tbody');
+								var tmphead = (tmp.slice(headstart));
+
+								var headend = tmphead.indexOf('</tbody>',1);
+								tmphead = tmphead.slice(0, headend + 9);
+								
+								var startkey = '<div style="overflow: -moz-scrollbars-none; overflow-x: hidden; width: 100%;" >'
+								var endkey = '</div>'
+
+
+								//var thcount = (tmphead.match(/<td /g) || []).length;
+								var tmpcontstring;
+								tmpcontstring = "";
+								for (i=1;i<=5;i++)
+								{
+								var thstart = tmphead.indexOf(startkey);
+								var thend = tmphead.indexOf(endkey);
+								var contstr = tmphead.slice(thstart, thend );
+								tmpcontstring = tmpcontstring + contstr.slice(startkey.length, thend) + ";"
+								tmphead = tmphead.slice(thend + 6, headend );
+								}
+								
+								var thlist = tmpstring.split(";");
+								var tdlist = tmpcontstring.split(";");
+								var finalstr = ""
+								for (x = 0; x<5; x++)
+								{
+								var mystr = tdlist[x];
+								if (mystr.indexOf("<input") < 0 ) {
+								finalstr = finalstr + thlist[x] + " : " + tdlist[x] + "\n" 
+								s.send(thlist[x] + " : " + tdlist[x]);
+								}
+
+								}
+								//alert(finalstr)
+							  console.log("final"+finalstr+"final");
+							 // s.send(finalstr);
 							  //console.log("text3=========: " + data.vehicleNumber)
 							  n();
 					});
