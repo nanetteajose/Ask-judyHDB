@@ -286,6 +286,21 @@ var searchParkingFines = function( session, address ) {
 	var thisbot = bot;			
 	
 	
+	request({
+					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					  method: "POST",
+					 
+						}, function(error, response, body) {
+							
+			 var msg = new builder.Message()
+								.address(m_address)
+								.text("connected to service searching now nn");
+							thisbot.send(msg);
+							
+						}
+			);			
+	
+	
 		request({
 					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
 					  method: "GET",
