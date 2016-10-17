@@ -285,7 +285,7 @@ var searchParkingFines = function( session, address ) {
 	var s = session;	
 	var txtbody;
 	var m_address = session.message.address;
-	//request.debug = true;
+	request.debug = true;
 	var thisbot = bot;			
 	
 	
@@ -294,8 +294,8 @@ var searchParkingFines = function( session, address ) {
 		
 			
 					request.post({
-						  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-						  
+						  //url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+						  url: "https://www20.hdb.gov.sg/bn25/isos118p.nsf/testing?OpenForm",
 						  jar: true,
 						  
 						  form: s.dialogData.requestdata
