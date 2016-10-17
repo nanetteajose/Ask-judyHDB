@@ -270,6 +270,9 @@ for(x in a) {
 });
 
 
+
+
+
 //search parking fines|offenses
 var request = require("request");
 var async = require("async");
@@ -282,7 +285,7 @@ var searchParkingFines = function( session, address ) {
 	var s = session;	
 	var txtbody;
 	var m_address = session.message.address;
-	request.debug = true;
+	//request.debug = true;
 	var thisbot = bot;			
 	
 	
@@ -508,8 +511,6 @@ intents.onDefault(function (session) {
 
 
 bot.dialog('/', intents);
-
-
 
 
 
