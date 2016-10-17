@@ -294,8 +294,8 @@ var searchParkingFines = function( session, address ) {
 		
 			
 					request.post({
-						  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-						  
+						  //url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+						  url: "https://services2.hdb.gov.sg/webapp/BN31AWERRCMobile/BN31PListingContractor.jsp",
 						  jar: true,
 						  
 						  form: s.dialogData.requestdata
@@ -386,8 +386,8 @@ var searchParkingFines = function( session, address ) {
 	//f1
 	function() {
 		request({
-					  url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
-					 
+					  //url: "https://services3.hdb.gov.sg/webapp/BL16AWESVPAYMENT/faces/JSP/eservices/pay/BL16REPayFromESVSearch.jsp",
+					 url: "https://services2.hdb.gov.sg/webapp/BN31AWERRCMobile/BN31PListingContractor.jsp",
 					  //url: "https://www.google.com.sg/",
 					  method: "GET",
 					  jar: true,
